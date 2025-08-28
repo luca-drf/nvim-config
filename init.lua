@@ -13,35 +13,74 @@ if not vim.loop.fs_stat(mini_path) then
   vim.cmd('echo "Installed `mini.nvim`" | redraw')
 end
 
+-- Set up 'mini.deps' (customize to your liking)
+require('mini.deps').setup({ path = { package = path_package } })
+local add, now, later = MiniDeps.add, MiniDeps.now, MiniDeps.later
 
-vim.g.mapleader = " "
+now(function()
+  vim.g.mapleader = " "
+  vim.o.hlsearch = false
+  vim.o.incsearch = true
+  vim.o.cursorline = true
+  vim.o.termguicolors = true
+end)
 
-require('mini.basics').setup()
-vim.cmd.colorscheme('miniautumn')
-vim.o.hlsearch = false
-vim.o.incsearch = true
-require('mini.icons').setup()
-require('mini.statusline').setup()
-require('mini.tabline').setup()
-require('mini.git').setup()
-require('mini.diff').setup()
-require('mini.completion').setup()
-require('mini.pairs').setup()
-require('mini.surround').setup()
-require('mini.notify').setup()
-require('mini.trailspace').setup()
-require('mini.indentscope').setup({
-  draw = {
-    animation = require('mini.indentscope').gen_animation.none()
-  }
-})
+now(function()
+  require('mini.notify').setup()
+  vim.notify = require('mini.notify').make_notify()
+end)
 
+now(function()
+  add('sainnhe/sonokai')
+  vim.g.sonokai_enable_italic = true
+  vim.cmd('colorscheme sonokai')
+end)
+
+now(function() require('mini.icons').setup() end)
+now(function() require('mini.tabline').setup() end)
+now(function() require('mini.statusline').setup() end)
+
+later(function() require('mini.basics').setup() end)
+later(function() require('mini.git').setup() end)
+later(function() require('mini.diff').setup() end)
+later(function() require('mini.completion').setup() end)
+later(function() require('mini.pairs').setup() end)
+later(function() require('mini.surround').setup() end)
+later(function() require('mini.comment').setup() end)
+later(function() require('mini.trailspace').setup() end)
+later(function()
+  require('mini.indentscope').setup({
+    draw = {
+      animation = require('mini.indentscope').gen_animation.none()
+    }
+  })
+end)
+
+
+later(function()
+  add({
+    source = 'nvim-treesitter/nvim-treesitter',
+    -- Use 'master' while monitoring updates in 'main'
+    checkout = 'master',
+    monitor = 'main',
+    -- Perform action after every checkout
+    hooks = { post_checkout = function() vim.cmd('TSUpdate') end },
+  })
+  -- Possible to immediately execute code which depends on the added plugin
+  require('nvim-treesitter.configs').setup({
+    ensure_installed = { 'lua', 'vimdoc' },
+    highlight = { enable = true },
+  })
+end)
+
+
+later(function()
 -- Disable autocompletion for text files
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = "text",
-  callback = function(args)
-    vim.b[args.buf].minicompletion_disable = true
-    vim.b[args.buf].miniindentscope_disable = true
-  end
-})
-
+  vim.api.nvim_create_autocmd("FileType", {
+    pattern = "text",
+    callback = function(args)
+      vim.b[args.buf].minicompletion_disable = true
+      vim.b[args.buf].miniindentscope_disable = true
+    end
+  })
+end)
