@@ -17,6 +17,7 @@ end
 require('mini.deps').setup({ path = { package = path_package } })
 local add, now, later = MiniDeps.add, MiniDeps.now, MiniDeps.later
 
+-- Settings loading immediately
 now(function()
   vim.g.mapleader = " "
   vim.o.hlsearch = false
@@ -39,7 +40,19 @@ end)
 now(function() require('mini.icons').setup() end)
 now(function() require('mini.tabline').setup() end)
 now(function() require('mini.statusline').setup() end)
+now(function()
+-- Disable autocompletion for text files
+  vim.api.nvim_create_autocmd("FileType", {
+    pattern = "text",
+    callback = function(args)
+      vim.b[args.buf].minicompletion_disable = true
+      vim.b[args.buf].miniindentscope_disable = true
+    end
+  })
+end)
 
+
+-- Settings loading in a later loop
 later(function() require('mini.basics').setup() end)
 later(function() require('mini.git').setup() end)
 later(function() require('mini.diff').setup() end)
@@ -55,7 +68,6 @@ later(function()
     }
   })
 end)
-
 
 later(function()
   add({
@@ -73,14 +85,3 @@ later(function()
   })
 end)
 
-
-later(function()
--- Disable autocompletion for text files
-  vim.api.nvim_create_autocmd("FileType", {
-    pattern = "text",
-    callback = function(args)
-      vim.b[args.buf].minicompletion_disable = true
-      vim.b[args.buf].miniindentscope_disable = true
-    end
-  })
-end)
