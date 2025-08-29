@@ -24,6 +24,10 @@ now(function()
   vim.o.incsearch = true
   vim.o.cursorline = true
   vim.o.termguicolors = true
+  vim.opt.tabstop = 4        -- Display width of a tab character
+  vim.opt.shiftwidth = 4     -- Number of spaces inserted for indentation
+  vim.opt.softtabstop = 4    -- Number of spaces a <Tab> counts for in insert mode
+  vim.opt.expandtab = true   -- Insert spaces when <Tab> is pressed
 end)
 
 now(function()
@@ -48,6 +52,17 @@ now(function()
       vim.b[args.buf].minicompletion_disable = true
       vim.b[args.buf].miniindentscope_disable = true
     end
+  })
+end)
+
+now(function()
+  vim.api.nvim_create_autocmd("FileType", {
+    pattern = { "lua", "javascript", "json" },
+    callback = function()
+      vim.opt_local.tabstop = 2
+      vim.opt_local.shiftwidth = 2
+      vim.opt_local.softtabstop = 2
+    end,
   })
 end)
 
