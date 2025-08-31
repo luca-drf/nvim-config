@@ -28,8 +28,10 @@ now(function()
   vim.opt.shiftwidth = 4     -- Number of spaces inserted for indentation
   vim.opt.softtabstop = 4    -- Number of spaces a <Tab> counts for in insert mode
   vim.opt.expandtab = true   -- Insert spaces when <Tab> is pressed
+  vim.opt.listchars = { tab = ">-", trail = "~", space = "·", eol = "¬" }
 end)
 
+now(function() require('mini.starter').setup() end)
 now(function()
   require('mini.notify').setup()
   vim.notify = require('mini.notify').make_notify()
@@ -77,6 +79,14 @@ later(function() require('mini.surround').setup() end)
 later(function() require('mini.comment').setup() end)
 later(function() require('mini.trailspace').setup() end)
 later(function()
+  vim.keymap.set('n', '\\l', ':set list!<CR>', { desc = "Toggle blank characters" })
+end)
+later(function()
+  require('mini.files').setup()
+  vim.keymap.set('n', '<leader>e', ':lua MiniFiles.open()<CR>', { desc = "Open file explorer" })
+end)
+
+later(function()
   require('mini.indentscope').setup({
     draw = {
       animation = require('mini.indentscope').gen_animation.none()
@@ -100,3 +110,7 @@ later(function()
   })
 end)
 
+later(function()
+  require('mini.trailspace').setup()
+  vim.keymap.set('n', '\\t', ':lua MiniTrailspace.trim()<CR>', { desc = "Trim trailing white spaces" })
+end)
