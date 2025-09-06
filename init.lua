@@ -20,6 +20,8 @@ local add, now, later = MiniDeps.add, MiniDeps.now, MiniDeps.later
 -- Settings loading immediately
 now(function()
   vim.g.mapleader = " "
+  -- Dedicated python venv with pynvim package installed
+  vim.g.python3_host_prog = vim.fn.expand('~/.pyenv/versions/pynvim/bin/python')
   vim.o.hlsearch = false
   vim.o.incsearch = true
   vim.o.cursorline = true
@@ -48,11 +50,24 @@ now(function() require('mini.tabline').setup() end)
 now(function() require('mini.statusline').setup() end)
 now(function()
 -- Disable autocompletion for text files
-  vim.api.nvim_create_autocmd("FileType", {
-    pattern = "text",
+  vim.api.nvim_create_autocmd('FileType', {
+    pattern = 'text',
     callback = function(args)
       vim.b[args.buf].minicompletion_disable = true
       vim.b[args.buf].miniindentscope_disable = true
+    end
+  })
+
+  -- Make headers act as borders in Python files (show the function body as scope)
+  vim.api.nvim_create_autocmd('FileType', {
+    pattern = 'python',
+    callback = function(args)
+      vim.b[args.buf].miniindentscope_config = {
+        options = {
+          try_as_border = true,
+          border = 'top', -- optional: avoids including the trailing blank line after a block
+        },
+      }
     end
   })
 end)
@@ -126,8 +141,9 @@ later(function()
   })
   -- Possible to immediately execute code which depends on the added plugin
   require('nvim-treesitter.configs').setup({
-    ensure_installed = { 'lua', 'vimdoc' },
+    ensure_installed = { 'lua', 'vimdoc', 'python', 'c', 'vim', 'typescript', 'javascript' },
     highlight = { enable = true },
+    additional_vim_regex_highlighting = false,
   })
 end)
 
