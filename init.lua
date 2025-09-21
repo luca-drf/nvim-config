@@ -2,12 +2,7 @@ local path_package = vim.fn.stdpath('data') .. '/site'
 local mini_path = path_package .. '/pack/deps/start/mini.nvim'
 if not vim.loop.fs_stat(mini_path) then
   vim.cmd('echo "Installing `mini.nvim`" | redraw')
-  local clone_cmd = {
-    'git', 'clone', '--filter=blob:none',
-    -- Uncomment next line to use 'stable' branch
-    -- '--branch', 'stable',
-    'https://github.com/echasnovski/mini.nvim', mini_path
-  }
+  local clone_cmd = { 'git', 'clone', '--depth=1', 'https://github.com/nvim-mini/mini.nvim', mini_path }
   vim.fn.system(clone_cmd)
   vim.cmd('packadd mini.nvim | helptags ALL')
   vim.cmd('echo "Installed `mini.nvim`" | redraw')
@@ -31,6 +26,9 @@ now(function()
   vim.opt.softtabstop = 4    -- Number of spaces a <Tab> counts for in insert mode
   vim.opt.expandtab = true   -- Insert spaces when <Tab> is pressed
   vim.opt.listchars = { tab = ">-", trail = "~", space = "·", eol = "¬" }
+  -- Yank to system clipboard with <leader>y
+  vim.keymap.set("n", "<leader>y", '"+y', { noremap = true, silent = true, desc = "Yank to system clipboard" })
+  vim.keymap.set("v", "<leader>y", '"+y', { noremap = true, silent = true, desc = "Yank selection to system clipboard" })
 end)
 
 now(function() require('mini.starter').setup() end)
